@@ -12,4 +12,11 @@
 }
 
 @layer components {
+  .inp-label {
+    @apply dark:text-slate-500 font-semibold;
+  }
+
+  .inp-text {
+    @apply dark:bg-slate-800 p-2 rounded-full;
+  }
 }

@@ -1,7 +1,8 @@
 import { Route, Routes, useLocation } from "react-router-dom";
 import AddMovie from "./pages/AddMovie";
 import Header from "./components/Header";
-import HomePage from "./pages/HomePage";
+import MovieView from "./pages/MoviesView";
+import MovieDetails from "./pages/MovieDetails";
 
 function App() {
   const location = useLocation();
@@ -11,12 +12,14 @@ function App() {
       <Header />
 
       <Routes location={background || location}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<MovieView />} />
         <Route path="/new" element={<AddMovie />} />
+        <Route path="/movie" element={<MovieDetails />} />
       </Routes>
       {background && (
         <Routes>
           <Route path="/new" element={<AddMovie />} />
+          <Route path="/movie" element={<MovieDetails />} />
         </Routes>
       )}
     </>
