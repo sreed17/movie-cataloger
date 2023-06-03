@@ -2,22 +2,9 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchAllMovies } from "@/lib/api-fetch/movie.fetch";
 import { verifyResponse } from "@/lib/api-fetch/securefetch";
-import MovieItemFV, { MovieItem } from "@/components/MovieItemFV";
+import MovieItemFV from "@/components/MovieItemFV";
 import MovieItemLV from "@/components/MovieItemLV";
-
-// TODO: remove this after testing
-
-const dummyDetails: MovieItem = {
-  title: "harry potter and the soccerers stone",
-  language: "english",
-  year: 2000,
-  status: "watched",
-  rating: 4,
-};
-
-const MovieList = new Array(5).fill(dummyDetails);
-
-// --------------------------------
+import { MovieItem } from "@/lib/api-fetch/api.types";
 
 function MoviesView() {
   const [movies, setMovies] = useState([]);
@@ -38,16 +25,16 @@ function MoviesView() {
   if (view === "list")
     return (
       <div className="w-full flex flex-col flex-wrap gap-2 items-center">
-        {MovieList.map((item, i) => (
-          <MovieItemLV key={`test-${i}`} id={`test-${i}`} details={item} />
+        {movies.map((item: MovieItem, i) => (
+          <MovieItemLV key={item._id} id={item._id} details={item} />
         ))}
       </div>
     );
 
   return (
     <div className="w-full flex flex-row flex-wrap gap-2 items-start justify-center">
-      {MovieList.map((item, i) => (
-        <MovieItemFV key={`test-${i}`} id={`test-${i}`} details={item} />
+      {movies.map((item: MovieItem, i) => (
+        <MovieItemFV key={item._id} id={item._id} details={item} />
       ))}
     </div>
   );

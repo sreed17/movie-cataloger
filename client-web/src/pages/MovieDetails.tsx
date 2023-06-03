@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import Modal from "@/components/Modal";
 import type { MovieItem } from "@/lib/api-fetch/api.types";
@@ -11,41 +11,13 @@ import {
   IoTrashBin,
 } from "react-icons/io5";
 import Rating from "@/components/Rating";
-
-//TODO: delete after testing
-function getThumbnailURL(id?: string) {
-  if (id) console.log("TODO: add a read getThumbnailURL function");
-  const dummyImg =
-    "https://m.media-amazon.com/images/M/MV5BNmQ0ODBhMjUtNDRhOC00MGQzLTk5MTAtZDliODg5NmU5MjZhXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_FMjpg_UX1000_.jpg";
-
-  return dummyImg;
-}
-const dummyDetails: MovieItem = {
-  title: "harry potter and the soccerers stone",
-  language: "english",
-  year: 2000,
-  status: "watched",
-  rating: 4,
-  ext: "mp4",
-};
-
-function getVideoStreamUrl(id: string) {
-  return "";
-}
-
-function getVideoDownloadUrl(id: string) {
-  return "";
-}
-
-async function updateMovieInfo(id: string, updates: any) {
-  return;
-}
-
-async function deleteMovie(id: string) {
-  return;
-}
-
-//--------------------------
+import {
+  getThumbnail,
+  getVideoPlaybackURL,
+  updateMovieInfo,
+  getVideoDownloadURL,
+  deleteMovie,
+} from "@/lib/api-fetch/movie.fetch";
 
 function MovieDetails() {
   const [playMode, setPlayMode] = useState(false);
@@ -56,9 +28,12 @@ function MovieDetails() {
   const location = useLocation();
   const [details, setDetails] = useState<MovieItem>(location.state.details);
 
+  const thumbRef = useRef<HTMLImageElement>(null);
+
   useEffect(() => {
-    console.log(changes);
-  }, [changes]);
+    if (details && details.thumbnail && thumbRef.current)
+      getThumbnail(details.thumbnail, thumbRef.current);
+  }, []);
 
   if (!id || !details) return null;
   return (
@@ -66,7 +41,8 @@ function MovieDetails() {
       <div className="w-full h-full flex flex-col md:flex-row">
         <div className="w-full h-[300px] md:w-[300px] md:h-full overflow-hidden ">
           <img
-            src={getThumbnailURL(id)}
+            ref={thumbRef}
+            src={`http://localhost:4000/api/v1/thumbnail/${details.thumbnail}`}
             alt={details.title}
             className="w-full md:h-full object-center md:object-cover opacity-60 hover:opacity-100 transition-opacity duration-300"
           />
@@ -140,7 +116,7 @@ function MovieDetails() {
             </div>
           </header>
           <div className="w-full flex-1 grid place-content-center dark:bg-slate-800 overflow-hidden rounded-md">
-            {!playMode ? (
+            {!playMode || !details.filename ? (
               <button
                 onClick={() => {
                   setPlayMode(true);
@@ -150,7 +126,7 @@ function MovieDetails() {
               </button>
             ) : (
               <video controls autoPlay className="w-full">
-                <source src={getVideoStreamUrl(id)} />
+                <source src={getVideoPlaybackURL(details.filename)} />
               </video>
             )}
           </div>
@@ -173,7 +149,7 @@ function MovieDetails() {
                 </button>
               )}
               <a
-                href={getVideoDownloadUrl(id)}
+                href={getVideoDownloadURL(details.filename)}
                 className="p-2 px-4 rounded-lg font-semibold text-sm text-slate-900 flex items-center justify-center bg-yellow-600"
               >
                 <IoDownload size={32} />
@@ -183,7 +159,7 @@ function MovieDetails() {
             <button
               className="p-2 rounded-lg  text-red-500 flex items-center justify-center dark:bg-[#0005] bg-slate-200 "
               onClick={() => {
-                deleteMovie(id)
+                deleteMovie(id, details.filename, details.thumbnail)
                   .then((resJson) => {
                     // condition for success
                     setChanges(null);
@@ -201,3 +177,5 @@ function MovieDetails() {
 }
 
 export default MovieDetails;
+
+/** HELPERS */

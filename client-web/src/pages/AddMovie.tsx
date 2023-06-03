@@ -3,18 +3,39 @@ import Modal from "@/components/Modal";
 import { IoCloudUpload, IoImage } from "react-icons/io5";
 
 function handleSubmit(trg: HTMLFormElement) {
-  //const fd_movieFile = new FormData();
-  //fd_movieFile.append("movie", trg.files[0]);
+  console.log("Submit handler");
   const fd_movieInfo = new FormData(trg);
-  for (const [key, val] of fd_movieInfo.entries()) {
-    console.log(key, val);
-  }
+
+  const dest = "http://localhost:4000/api/v1/movie/cud";
+  // getting id
+  fetch(dest, { method: "get" })
+    .then((res) => res.json())
+    .then((resJson) => {
+      const {
+        payload: { id },
+      } = resJson;
+      if (!id) throw new Error("No id");
+      console.log(id);
+      const formData = new FormData();
+      formData.append("_id", id);
+      for (const [key, val] of fd_movieInfo.entries()) {
+        formData.append(key, val);
+      }
+      fetch(dest, { method: "post", body: formData })
+        .then((res) => res.json())
+        .then((resJson) => {
+          console.log(resJson);
+        })
+        .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
 }
 
 function AddMovie() {
   return (
     <Modal isOpen={true}>
       <form
+        encType="multipart/form-data"
         className="w-full h-full dark:bg-slate-900 flex flex-col md:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
@@ -49,7 +70,7 @@ function AddMovie() {
               <input
                 type="text"
                 id="nm-language"
-                name="langauage"
+                name="language"
                 className="inp-text"
               />
               <label htmlFor="nm-year" className="inp-label">
@@ -65,7 +86,8 @@ function AddMovie() {
                 Status
               </label>
               <select
-                name="nm-status"
+                name="status"
+                id="nm-status"
                 defaultValue={"new"}
                 className="inp-text"
               >

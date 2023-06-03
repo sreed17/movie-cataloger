@@ -11,6 +11,7 @@ function CustomFileInput({ icon, label, type, ...rest }: PropType) {
   return (
     <div>
       <button
+        type="button"
         onClick={() => {
           const inpElem = inputRef.current;
           if (inpElem) inpElem.click();

@@ -9,85 +9,70 @@ const getApiUrl = (id?: string, p?: string) => {
   return c_url;
 };
 
-export async function fetchMovieById(id: string) {
-  const dest = getApiUrl(id);
-  const opt: RequestInit = { method: "get" };
-  const res = await fetch(dest, opt);
-  return res.json();
-}
-
 export async function fetchAllMovies() {
-  const dest = getApiUrl();
+  const dest = `${getApiUrl()}/search`;
   console.log(dest);
   const opt: RequestInit = {
-    method: "get",
-  };
-  const res = await fetch(dest, opt);
-  return res.json();
-}
-
-export async function addMovie(input: any) {
-  const dest = getApiUrl();
-  const opt: RequestInit = {
     method: "post",
+  };
+  const res = await fetch(dest, opt);
+  return res.json();
+}
+
+export function getThumbnail(filename: string, imgElem: HTMLImageElement) {
+  const dest = `http://localhost:4000/api/v1/movie/thumbnail/${filename}`;
+  fetch(dest, { method: "get" })
+    .then((res) => res.blob())
+    .then((r_blob) => {
+      const objURL = URL.createObjectURL(r_blob);
+      imgElem.src = objURL;
+    })
+    .catch((err) => console.log(err));
+}
+
+export async function updateMovieInfo(id: string, updates: any) {
+  const dest = `http://localhost:4000/api/v1/movie/cud/${id}`;
+  const opts = {
+    method: "put",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
+    body: JSON.stringify(updates),
   };
-  const res = await fetch(dest, opt);
-  return res.json();
+  const res = await fetch(dest, opts);
+  const { status, payload } = await res.json();
+  if (!status || !payload) throw new Error("No status or payload");
+  if (status !== "success") throw new Error("The request was not successful");
+  return payload;
 }
 
-export async function removeMovie(id: string) {
-  const dest = getApiUrl(id);
-  const opt: RequestInit = {
-    method: "delete",
-  };
-  const res = await fetch(dest, opt);
-  return res.json();
-}
-
-export async function removeMovies(input: any) {
-  const dest = getApiUrl();
-  const opt: RequestInit = {
-    method: "delete",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
-  };
-  const res = await fetch(dest, opt);
-  return res.json();
-}
-
-export async function uploadMovieFile(
+export async function deleteMovie(
   id: string,
-  formData: FormData,
-  filename?: string
+  fn_file: string,
+  fn_thumb?: string
 ) {
-  let dest = getApiUrl(id, `/file`);
-  if (filename) dest += `?fln=${filename}`;
-  const opt: RequestInit = {
-    method: "post",
-    headers: { "content-type": "multipart/form-data" },
-    body: formData,
-  };
-  const res = await fetch(dest, opt);
-  return res.json();
+  const opt = { method: "delete" };
+  const dest_info = `http://localhost:4000/api/v1/movie/cud/${id}`;
+  const dest_file = `http://localhost:4000/api/v1/movie/file/${fn_file}`;
+
+  const infoDeleteRes = await fetch(dest_info, opt);
+  const infoDeleteJson = await infoDeleteRes.json();
+  const fileDeleteRes = await fetch(dest_file, opt);
+  const fileDeleteJson = await fileDeleteRes.json();
+
+  const ret_value = [infoDeleteJson, fileDeleteJson];
+
+  if (fn_thumb) {
+    const dest_thumb = `http://localhost:4000/api/v1/movie/thumbnail/${fn_thumb}`;
+    const thumbDeleteRes = await fetch(dest_thumb, opt);
+    const thumbDeleteJson = await thumbDeleteRes.json();
+    ret_value.push(thumbDeleteJson);
+  }
+  return ret_value;
 }
 
-export async function deleteMovieFile(id: string, filename: string) {
-  const dest = getApiUrl(id, `/file`);
-  const opt: RequestInit = {
-    method: "delete",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ filename }),
-  };
-  const res = await fetch(dest, opt);
-  return res.json();
+export function getVideoPlaybackURL(filename: string) {
+  return `http://localhost:4000/api/v1/movie/file/${filename}`;
 }
 
-export function getPlaybackLink(id: string, ext: string) {
-  return getApiUrl(id, `/file?ext=${ext}`);
-}
-
-export function getDownloadLink(id: string, ext: string) {
-  return getApiUrl(id, `/file/download?ext=${ext}`);
+export function getVideoDownloadURL(filename: string) {
+  return `http://localhost:4000/api/v1/movie/file/download/${filename}`;
 }

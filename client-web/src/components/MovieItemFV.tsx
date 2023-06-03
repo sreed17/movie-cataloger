@@ -1,45 +1,35 @@
+import { useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { IoStar } from "react-icons/io5";
-
-export type MovieItem = {
-  title: string;
-  language: string;
-  year: number;
-  status: "watching" | "watched";
-  rating: number;
-};
+import type { MovieItem } from "@/lib/api-fetch/api.types";
+import { getThumbnail } from "@/lib/api-fetch/movie.fetch";
 
 interface PropType {
   id: string;
   details: MovieItem;
 }
-
-// TODO: remove this after testing
-function getThumbnailURL(id?: string) {
-  if (id) console.log("TODO: add a read getThumbnailURL function");
-  const dummyImg =
-    "https://m.media-amazon.com/images/M/MV5BNmQ0ODBhMjUtNDRhOC00MGQzLTk5MTAtZDliODg5NmU5MjZhXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_FMjpg_UX1000_.jpg";
-
-  return dummyImg;
-}
-// --------------------------------
-
 function MovieItemFV({ id, details }: PropType) {
   const location = useLocation();
+  const thumbRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (details.thumbnail && thumbRef.current)
+      getThumbnail(details.thumbnail, thumbRef.current);
+  }, []);
 
   if (!details) return null;
   return (
     <Link to={`/movie?id=${id}`} state={{ background: location, details }}>
       <figure className="overflow-hidden w-fit m-2   ">
         <img
-          src={getThumbnailURL(id)}
+          ref={thumbRef}
           alt={details.title}
           className=" w-[200px] h-[300px] rounded-md border-solid border-2 border-[#FFF2]"
           title={details.title}
         />
         <figcaption className="w-[200px]">
           <div
-            className="truncate font-semibold capitalize"
+            className="truncate font-semibold capitalize text-center"
             title={details.title}
           >
             {details.title}

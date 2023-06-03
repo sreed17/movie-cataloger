@@ -14,13 +14,14 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
-  server: {
-    proxy: {
-      "/api/v1": {
-        target: "http://localhost:4000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
 });
+
+// server: {
+//     proxy: {
+//       "/api/v1": {
+//         target: "http://localhost:4000",
+//         changeOrigin: true,
+//         secure: false,
+//       },
+//     },
+//   },

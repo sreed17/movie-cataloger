@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { initDBConnection } from "./models/init-db";
 import routers from "./routers";
 import { customErrorHandler } from "./utils/error-handler";
+import cors from "cors";
 dotenv.config();
 
 const app = express();
@@ -12,6 +13,7 @@ initDBConnection();
 
 /** ----- MIDDLEWARES ----- */
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
