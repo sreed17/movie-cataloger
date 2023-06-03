@@ -5,11 +5,11 @@ interface PropType extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
-function CustomFileInput({ icon, label, type, ...rest }: PropType) {
+function CustomFileInput({ icon, className, label, type, ...rest }: PropType) {
   const inputRef = useRef<HTMLInputElement>(null);
   if (type) console.log("type is file by default, its unchangable");
   return (
-    <div>
+    <div {...(className ? { className } : {})}>
       <button
         type="button"
         onClick={() => {

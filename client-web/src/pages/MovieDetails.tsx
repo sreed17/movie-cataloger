@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal";
 import type { MovieItem } from "@/lib/api-fetch/api.types";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/lib/api-fetch/movie.fetch";
 
 function MovieDetails() {
+  const navigate = useNavigate();
   const [playMode, setPlayMode] = useState(false);
   const [changes, setChanges] = useState<null | Partial<MovieItem>>(null);
   const [ratingEditor, setRatingEditor] = useState(false);
@@ -159,12 +160,18 @@ function MovieDetails() {
             <button
               className="p-2 rounded-lg  text-red-500 flex items-center justify-center dark:bg-[#0005] bg-slate-200 "
               onClick={() => {
-                deleteMovie(id, details.filename, details.thumbnail)
-                  .then(() => {
-                    // TODO:condition for success
-                    setChanges(null);
-                  })
-                  .catch((err) => console.log(err));
+                if (
+                  window.confirm(
+                    "File will be permenantly deleted. Are you sure?"
+                  )
+                )
+                  deleteMovie(id, details.filename, details.thumbnail)
+                    .then(() => {
+                      // TODO:condition for success
+                      setChanges(null);
+                      navigate(-1);
+                    })
+                    .catch((err) => console.log(err));
               }}
             >
               <IoTrashBin size={24} />

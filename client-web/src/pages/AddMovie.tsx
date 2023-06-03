@@ -1,9 +1,25 @@
 import CustomFileInput from "@/components/CustomFileInput";
+import { useState, useEffect } from "react";
 import Modal from "@/components/Modal";
-import { createMovieEntryFromForm } from "@/lib/api-fetch/movie.fetch";
+import { createMovieEntryFromForm2 } from "@/lib/api-fetch/movie.fetch";
 import { IoCloudUpload, IoImage } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 function AddMovie() {
+  const navigate = useNavigate();
+  const [thumbFile, setThumbFile] = useState<null | string>(null);
+  const [videoFile, setVideoFile] = useState<null | string>(null);
+  const [uploadProgress, setUploadProgress] = useState<null | number>(null);
+
+  useEffect(() => {
+    return () => {
+      if (thumbFile) {
+        window.URL.revokeObjectURL(thumbFile);
+        console.log("Cleaned up, add movie, url Revoked");
+      }
+    };
+  }, [thumbFile]);
+
   return (
     <Modal isOpen={true}>
       <form
@@ -11,14 +27,36 @@ function AddMovie() {
         className="w-full h-full dark:bg-slate-900 flex flex-col md:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
-          createMovieEntryFromForm(e.currentTarget);
+          createMovieEntryFromForm2(
+            e.currentTarget,
+            (percent) => {
+              setUploadProgress(percent);
+            },
+            () => {
+              navigate(-1);
+            }
+          );
         }}
       >
-        <div className="w-full h-[200px] md:w-[200px] md:h-full dark:bg-slate-800 grid place-content-center">
+        <div className="w-full h-[200px] md:w-[200px] md:h-full dark:bg-slate-800 overflow-hidden relative">
+          {thumbFile && (
+            <img
+              src={thumbFile}
+              alt=""
+              className="absolute z-[0] w-full md:object-cover md:h-full"
+            />
+          )}
           <CustomFileInput
+            className="z-10 absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
             name="thumbnail"
             icon={<IoImage size={64} className="dark:text-slate-400" />}
             label="Upload Thumbnail"
+            onChange={(e) => {
+              if (e.target.files) {
+                const f_url = window.URL.createObjectURL(e.target.files[0]);
+                setThumbFile(f_url);
+              }
+            }}
           />
         </div>
         <div className="w-full h-full p-4 flex flex-col gap-2">
@@ -74,13 +112,23 @@ function AddMovie() {
                 icon={
                   <IoCloudUpload size={64} className="dark:text-slate-400" />
                 }
-                label="Upload Movie"
+                label={videoFile ? videoFile : "Upload Movie"}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    const file = e.target.files[0];
+                    setVideoFile(file.name);
+                  }
+                }}
               />
             </div>
           </div>
           <div className="p-2 flex flex-row items-end justify-center border-t-2 border-solid dark:border-t-slate-700">
             <button className="p-2 bg-yellow-600 rounded-full w-full">
-              Submit
+              {uploadProgress ? (
+                <progress max={100} value={uploadProgress} />
+              ) : (
+                "Submit"
+              )}
             </button>
           </div>
         </div>

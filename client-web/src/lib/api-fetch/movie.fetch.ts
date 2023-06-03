@@ -1,11 +1,15 @@
 import apiConfig from "./api-config";
+import axios from "axios";
 
 const getApiUrl = () => {
   const c_url = `${apiConfig.baseUrl}/movie`;
   return c_url;
 };
 
-export function createMovieEntryFromForm(trg: HTMLFormElement) {
+export function createMovieEntryFromForm(
+  trg: HTMLFormElement,
+  cb?: (payload: any) => void
+) {
   const fd_movieInfo = new FormData(trg);
 
   const dest = `${getApiUrl()}/cud`;
@@ -25,7 +29,58 @@ export function createMovieEntryFromForm(trg: HTMLFormElement) {
       fetch(dest, { method: "post", body: formData })
         .then((res) => res.json())
         .then((resJson) => {
-          console.log(resJson);
+          const { status, payload } = resJson;
+          if (status != "success")
+            return window.alert("Movie Entry couldn't be stored, try again!");
+          window.alert("Movie Entry successfully created");
+          if (cb) cb(payload);
+        })
+        .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
+}
+
+export function createMovieEntryFromForm2(
+  trg: HTMLFormElement,
+  uploadProgress: (percent: number, progress?: number) => void,
+  cb?: (payload: any) => void
+) {
+  const fd_movieInfo = new FormData(trg);
+
+  const dest = `${getApiUrl()}/cud`;
+  // getting id
+  fetch(dest, { method: "get" })
+    .then((res) => res.json())
+    .then((resJson) => {
+      const {
+        payload: { id },
+      } = resJson;
+      if (!id) throw new Error("No id");
+      const formData = new FormData();
+      formData.append("_id", id);
+      for (const [key, val] of fd_movieInfo.entries()) {
+        formData.append(key, val);
+      }
+      axios
+        .request({
+          method: "post",
+          url: dest,
+          data: formData,
+          onUploadProgress: (p) => {
+            const { loaded, total, progress } = p;
+            if (
+              typeof total !== "undefined" &&
+              typeof progress !== "undefined"
+            ) {
+              const percent = (loaded / total) * 100;
+              uploadProgress(percent, progress);
+            } else {
+              uploadProgress(loaded);
+            }
+          },
+        })
+        .then((data) => {
+          cb && cb(data.data);
         })
         .catch((err) => console.log(err));
     })
