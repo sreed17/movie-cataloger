@@ -137,8 +137,8 @@ function MovieDetails() {
                   className="p-2 px-4 rounded-lg font-semibold text-sm text-slate-900 flex items-center justify-center bg-green-600"
                   onClick={() => {
                     updateMovieInfo(id, changes)
-                      .then((resJson) => {
-                        // condition for success
+                      .then(() => {
+                        // TODO:condition for success
                         setChanges(null);
                       })
                       .catch((err) => console.log(err));
@@ -160,8 +160,8 @@ function MovieDetails() {
               className="p-2 rounded-lg  text-red-500 flex items-center justify-center dark:bg-[#0005] bg-slate-200 "
               onClick={() => {
                 deleteMovie(id, details.filename, details.thumbnail)
-                  .then((resJson) => {
-                    // condition for success
+                  .then(() => {
+                    // TODO:condition for success
                     setChanges(null);
                   })
                   .catch((err) => console.log(err));

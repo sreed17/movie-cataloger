@@ -1,35 +1,7 @@
 import CustomFileInput from "@/components/CustomFileInput";
 import Modal from "@/components/Modal";
+import { createMovieEntryFromForm } from "@/lib/api-fetch/movie.fetch";
 import { IoCloudUpload, IoImage } from "react-icons/io5";
-
-function handleSubmit(trg: HTMLFormElement) {
-  console.log("Submit handler");
-  const fd_movieInfo = new FormData(trg);
-
-  const dest = "http://localhost:4000/api/v1/movie/cud";
-  // getting id
-  fetch(dest, { method: "get" })
-    .then((res) => res.json())
-    .then((resJson) => {
-      const {
-        payload: { id },
-      } = resJson;
-      if (!id) throw new Error("No id");
-      console.log(id);
-      const formData = new FormData();
-      formData.append("_id", id);
-      for (const [key, val] of fd_movieInfo.entries()) {
-        formData.append(key, val);
-      }
-      fetch(dest, { method: "post", body: formData })
-        .then((res) => res.json())
-        .then((resJson) => {
-          console.log(resJson);
-        })
-        .catch((err) => console.log(err));
-    })
-    .catch((err) => console.log(err));
-}
 
 function AddMovie() {
   return (
@@ -39,7 +11,7 @@ function AddMovie() {
         className="w-full h-full dark:bg-slate-900 flex flex-col md:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit(e.currentTarget);
+          createMovieEntryFromForm(e.currentTarget);
         }}
       >
         <div className="w-full h-[200px] md:w-[200px] md:h-full dark:bg-slate-800 grid place-content-center">

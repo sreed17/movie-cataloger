@@ -1,17 +1,39 @@
 import apiConfig from "./api-config";
 
-const getApiUrl = (id?: string, p?: string) => {
-  let c_url = `${apiConfig.baseUrl}/movie`;
-  if (!id) return c_url;
-  c_url += `/${id}`;
-  if (!p) return c_url;
-  c_url += `${p}`;
+const getApiUrl = () => {
+  const c_url = `${apiConfig.baseUrl}/movie`;
   return c_url;
 };
 
+export function createMovieEntryFromForm(trg: HTMLFormElement) {
+  const fd_movieInfo = new FormData(trg);
+
+  const dest = `${getApiUrl()}/cud`;
+  // getting id
+  fetch(dest, { method: "get" })
+    .then((res) => res.json())
+    .then((resJson) => {
+      const {
+        payload: { id },
+      } = resJson;
+      if (!id) throw new Error("No id");
+      const formData = new FormData();
+      formData.append("_id", id);
+      for (const [key, val] of fd_movieInfo.entries()) {
+        formData.append(key, val);
+      }
+      fetch(dest, { method: "post", body: formData })
+        .then((res) => res.json())
+        .then((resJson) => {
+          console.log(resJson);
+        })
+        .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
+}
+
 export async function fetchAllMovies() {
   const dest = `${getApiUrl()}/search`;
-  console.log(dest);
   const opt: RequestInit = {
     method: "post",
   };
@@ -20,7 +42,7 @@ export async function fetchAllMovies() {
 }
 
 export function getThumbnail(filename: string, imgElem: HTMLImageElement) {
-  const dest = `http://localhost:4000/api/v1/movie/thumbnail/${filename}`;
+  const dest = `${getApiUrl()}/thumbnail/${filename}`;
   fetch(dest, { method: "get" })
     .then((res) => res.blob())
     .then((r_blob) => {
@@ -31,7 +53,7 @@ export function getThumbnail(filename: string, imgElem: HTMLImageElement) {
 }
 
 export async function updateMovieInfo(id: string, updates: any) {
-  const dest = `http://localhost:4000/api/v1/movie/cud/${id}`;
+  const dest = `${getApiUrl()}/cud/${id}`;
   const opts = {
     method: "put",
     headers: { "content-type": "application/json" },
@@ -50,8 +72,8 @@ export async function deleteMovie(
   fn_thumb?: string
 ) {
   const opt = { method: "delete" };
-  const dest_info = `http://localhost:4000/api/v1/movie/cud/${id}`;
-  const dest_file = `http://localhost:4000/api/v1/movie/file/${fn_file}`;
+  const dest_info = `${getApiUrl()}/cud/${id}`;
+  const dest_file = `${getApiUrl()}/file/${fn_file}`;
 
   const infoDeleteRes = await fetch(dest_info, opt);
   const infoDeleteJson = await infoDeleteRes.json();
@@ -61,7 +83,7 @@ export async function deleteMovie(
   const ret_value = [infoDeleteJson, fileDeleteJson];
 
   if (fn_thumb) {
-    const dest_thumb = `http://localhost:4000/api/v1/movie/thumbnail/${fn_thumb}`;
+    const dest_thumb = `${getApiUrl()}/thumbnail/${fn_thumb}`;
     const thumbDeleteRes = await fetch(dest_thumb, opt);
     const thumbDeleteJson = await thumbDeleteRes.json();
     ret_value.push(thumbDeleteJson);
@@ -70,9 +92,9 @@ export async function deleteMovie(
 }
 
 export function getVideoPlaybackURL(filename: string) {
-  return `http://localhost:4000/api/v1/movie/file/${filename}`;
+  return `${getApiUrl()}/file/${filename}`;
 }
 
 export function getVideoDownloadURL(filename: string) {
-  return `http://localhost:4000/api/v1/movie/file/download/${filename}`;
+  return `${getApiUrl()}/file/download/${filename}`;
 }

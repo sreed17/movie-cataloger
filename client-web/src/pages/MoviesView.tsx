@@ -25,7 +25,7 @@ function MoviesView() {
   if (view === "list")
     return (
       <div className="w-full flex flex-col flex-wrap gap-2 items-center">
-        {movies.map((item: MovieItem, i) => (
+        {movies.map((item: MovieItem) => (
           <MovieItemLV key={item._id} id={item._id} details={item} />
         ))}
       </div>
@@ -33,7 +33,7 @@ function MoviesView() {
 
   return (
     <div className="w-full flex flex-row flex-wrap gap-2 items-start justify-center">
-      {movies.map((item: MovieItem, i) => (
+      {movies.map((item: MovieItem) => (
         <MovieItemFV key={item._id} id={item._id} details={item} />
       ))}
     </div>
