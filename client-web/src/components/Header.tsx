@@ -7,7 +7,7 @@ function Header() {
   const view = searchParams.get("view");
 
   return (
-    <header className="flex flex-row items-center justify-center gap-4 m-4 ">
+    <header className="flex flex-row items-center justify-center gap-4 m-4 py-2 sticky top-0 bg-slate-200 dark:bg-black z-50">
       <div className="w-full md:w-[40%] flex flex-row items-center justify-center gap-2 border-solid border-2 dark:border-slate-900 px-4 rounded-full">
         <button>
           <IoSearch size={32} />

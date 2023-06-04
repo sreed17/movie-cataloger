@@ -34,8 +34,8 @@ function MovieItemFV({ id, details }: PropType) {
           >
             {details.title}
           </div>
-          <div className="flex flex-row items-center justify-between text-sm text-slate-800 relative">
-            <span className=" text-yellow-600 font-bold absolute top-[-50px] right-[10px] flex flex-row items-center justify-center gap-1 shadow-lg">
+          <div className="flex flex-row items-center justify-between text-sm text-slate-800 relative z-1">
+            <span className=" text-yellow-600 font-bold absolute top-[-50px] right-[10px] z-2 flex flex-row items-center justify-center gap-1 shadow-lg">
               <IoStar size={16} />
               {details.rating}
             </span>

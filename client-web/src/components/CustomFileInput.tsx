@@ -16,10 +16,14 @@ function CustomFileInput({ icon, className, label, type, ...rest }: PropType) {
           const inpElem = inputRef.current;
           if (inpElem) inpElem.click();
         }}
-        className="flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center w-full"
       >
         {icon}
-        {label && <span className="dark:text-slate-500">{label}</span>}
+        {label && (
+          <span className="dark:text-slate-500 w-full" title={label}>
+            {label}
+          </span>
+        )}
       </button>
       <input className="hidden" ref={inputRef} type="file" {...rest} />
     </div>

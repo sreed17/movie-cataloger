@@ -9,7 +9,9 @@ function AddMovie() {
   const navigate = useNavigate();
   const [thumbFile, setThumbFile] = useState<null | string>(null);
   const [videoFile, setVideoFile] = useState<null | string>(null);
-  const [uploadProgress, setUploadProgress] = useState<null | number>(null);
+  const [uploadProgress, setUploadProgress] = useState<undefined | number>(
+    undefined
+  );
 
   useEffect(() => {
     return () => {
@@ -33,7 +35,7 @@ function AddMovie() {
               setUploadProgress(percent);
             },
             () => {
-              navigate(-1);
+              navigate("/");
             }
           );
         }}
@@ -106,11 +108,14 @@ function AddMovie() {
                 <option value="watched">Watched</option>
               </select>
             </div>
-            <div className="w-full md:w-[160px] grid place-content-center">
+            <div className="w-full md:w-[160px] grid place-content-center overflow-hidden">
               <CustomFileInput
                 name="movie"
                 icon={
-                  <IoCloudUpload size={64} className="dark:text-slate-400" />
+                  <IoCloudUpload
+                    size={64}
+                    className="dark:text-slate-400 w-full md:max-w-[100px]"
+                  />
                 }
                 label={videoFile ? videoFile : "Upload Movie"}
                 onChange={(e) => {
@@ -123,7 +128,12 @@ function AddMovie() {
             </div>
           </div>
           <div className="p-2 flex flex-row items-end justify-center border-t-2 border-solid dark:border-t-slate-700">
-            <button className="p-2 bg-yellow-600 rounded-full w-full">
+            <button
+              className="p-2 bg-yellow-600 rounded-full w-full"
+              disabled={
+                typeof uploadProgress !== "undefined" && uploadProgress >= 0
+              }
+            >
               {uploadProgress ? (
                 <progress max={100} value={uploadProgress} />
               ) : (
