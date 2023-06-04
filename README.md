@@ -5,6 +5,8 @@ A simple app to organize your movie files
 1. Add movie entry - upload file, upload thumbnail, add details
 2. Query movies from the store
 3. Stream the video
+4. Download
+5. Delete the movie entry and related files
 
 ## Preview
 ![preview-demo](https://github.com/sreed17/movie-cataloger/assets/64097746/7b748938-4987-4cd4-bfaf-50978472a2bd)
